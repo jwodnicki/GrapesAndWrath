@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace GrapesAndWrath
@@ -60,7 +59,7 @@ namespace GrapesAndWrath
 				{
 					while ((word = reader.ReadLine()) != null)
 					{
-						Add(wordSourceMap[wordSource], word.TrimEnd('\r', '\n'));
+						Add(wordSourceMap[wordSource], word);
 					}
 				}
 			}
@@ -73,7 +72,7 @@ namespace GrapesAndWrath
 			WordTrie wtPrev = null;
 			foreach (char c in wordAsc)
 			{
-				if(wt.ContainsKey(c))
+				if (wt.ContainsKey(c))
 				{
 					wtPrev = wt[c];
 					wt = wt[c].Next;
@@ -107,16 +106,16 @@ namespace GrapesAndWrath
 		{
 			var results = new List<WordScore>();
 
-			foreach(KeyValuePair<char, WordTrie> w in wt)
+			foreach (KeyValuePair<char, WordTrie> w in wt)
 			{
 				bool matchFound = false;
 				string lettersNext = null;
 				for (int i = 0; i < lettersAsc.Length; i++)
 				{
-					 if (lettersAsc[i] < w.Key)
-					 {
-						 continue;
-					 }
+					if (lettersAsc[i] < w.Key)
+					{
+						continue;
+					}
 					if (lettersAsc[i] > w.Key)
 					{
 						break;

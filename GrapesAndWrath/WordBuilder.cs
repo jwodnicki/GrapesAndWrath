@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace GrapesAndWrath
@@ -9,13 +9,16 @@ namespace GrapesAndWrath
 	public class WordBuilder
 	{
 		private WordPile wp;
-		public async void Initialize()
+		public async void Initialize(BackgroundWorker worker)
 		{
 			wp = new WordPile();
 
 			string[] wordFiles = { "Zynga", "TWL 06", "SOWPODS" };
+
+			int i = 0;
 			foreach (string wordFile in wordFiles)
 			{
+				worker.ReportProgress(++i * 33);
 				await wp.AddAsync(wordFile);
 			}
 		}

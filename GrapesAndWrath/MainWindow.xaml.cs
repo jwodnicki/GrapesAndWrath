@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Data;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Input;
 
 namespace GrapesAndWrath
@@ -35,8 +32,22 @@ namespace GrapesAndWrath
 			combo.SelectionChanged += eventCombo;
 			input.Focus();
 
-			wordBuilder = new WordBuilder();
-			wordBuilder.Initialize();
+			BackgroundWorker worker = new BackgroundWorker();
+			worker.WorkerReportsProgress = true;
+			worker.ProgressChanged += (sender, e) =>
+			{
+				progress.Value = e.ProgressPercentage;
+			};
+			worker.DoWork += (sender, e) =>
+				{
+					wordBuilder = new WordBuilder();
+					wordBuilder.Initialize(worker);
+				};
+			worker.RunWorkerCompleted += (sender, e) =>
+				{
+					progress.Visibility = Visibility.Collapsed;
+				};
+			worker.RunWorkerAsync();
 
 			wordCache = new Dictionary<string, List<WordScore>>();
 		}
