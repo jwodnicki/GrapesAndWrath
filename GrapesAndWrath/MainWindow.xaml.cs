@@ -32,21 +32,12 @@ namespace GrapesAndWrath
 			combo.SelectionChanged += eventCombo;
 			input.Focus();
 
+			wordBuilder = new WordBuilder();
 			BackgroundWorker worker = new BackgroundWorker();
 			worker.WorkerReportsProgress = true;
-			worker.ProgressChanged += (sender, e) =>
-			{
-				progress.Value = e.ProgressPercentage;
-			};
-			worker.DoWork += (sender, e) =>
-				{
-					wordBuilder = new WordBuilder();
-					wordBuilder.Initialize(worker);
-				};
-			worker.RunWorkerCompleted += (sender, e) =>
-				{
-					progress.Visibility = Visibility.Collapsed;
-				};
+			worker.ProgressChanged    += (sender, e) => progress.Value = e.ProgressPercentage;
+			worker.DoWork             += (sender, e) => wordBuilder.Initialize(worker);
+			worker.RunWorkerCompleted += (sender, e) => progress.Visibility = Visibility.Collapsed;
 			worker.RunWorkerAsync();
 
 			wordCache = new Dictionary<string, List<WordScore>>();
