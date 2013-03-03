@@ -30,7 +30,7 @@ namespace GrapesAndWrath
 				}
 			}
 			results.AddRange(wp.GetWords(wordSource, lettersAsc));
-			return results.GroupBy(x => x.Word).Select(g => g.First()).OrderBy(x => x.Score).ThenBy(x => x.Word).ToList();
+			return results.GroupBy(x => x.Word).Select(g => g.First()).OrderByDescending(x => x.Score).ThenBy(x => x.Word).ToList();
 		}
 	}
 }
