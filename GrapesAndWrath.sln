@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GrapesAndWrath", "GrapesAndWrath\GrapesAndWrath.csproj", "{0B648DBA-CA3D-49D3-B87D-D9B2F320E7AD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileMaker", "FileMaker\FileMaker.csproj", "{6AA7793E-7C9E-4D5A-A6EC-12D2BFE8EC52}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -13,6 +15,10 @@ Global
 		{0B648DBA-CA3D-49D3-B87D-D9B2F320E7AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0B648DBA-CA3D-49D3-B87D-D9B2F320E7AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0B648DBA-CA3D-49D3-B87D-D9B2F320E7AD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6AA7793E-7C9E-4D5A-A6EC-12D2BFE8EC52}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6AA7793E-7C9E-4D5A-A6EC-12D2BFE8EC52}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6AA7793E-7C9E-4D5A-A6EC-12D2BFE8EC52}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6AA7793E-7C9E-4D5A-A6EC-12D2BFE8EC52}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -9,18 +9,9 @@ namespace GrapesAndWrath
 	public class WordBuilder
 	{
 		private WordPile wp;
-		public async void Initialize(BackgroundWorker worker)
+		public void Initialize(BackgroundWorker worker)
 		{
-			wp = new WordPile();
-
-			string[] wordFiles = { "Zynga", "TWL 06", "SOWPODS" };
-
-			int i = 0;
-			foreach (string wordFile in wordFiles)
-			{
-				worker.ReportProgress(++i * 33);
-				await wp.AddAsync(wordFile);
-			}
+			wp = new WordPile(x => worker.ReportProgress(x));
 		}
 
 		public async Task<List<WordScore>> GetWordsAsync(string wordSource, string lettersAsc)

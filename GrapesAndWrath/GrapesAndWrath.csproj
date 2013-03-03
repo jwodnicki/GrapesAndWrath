@@ -131,6 +131,7 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
+    <EmbeddedResource Include="Resources\All.gz" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -153,17 +154,9 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\Zynga.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Titlebar.ico" />
   </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\TWL 06.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\SOWPODS.txt" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

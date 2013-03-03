@@ -16,6 +16,10 @@ namespace GrapesAndWrath
 		private WordBuilder wordBuilder;
 		private Dictionary<string, List<WordScore>> wordCache;
 
+		private string[] nextWork;
+		private BackgroundWorker andre;
+		private List<WordScore> results;
+
 		public MainWindow()
 		{
 			InitializeComponent();
@@ -33,52 +37,80 @@ namespace GrapesAndWrath
 			input.Focus();
 
 			wordBuilder = new WordBuilder();
-			BackgroundWorker worker = new BackgroundWorker();
-			worker.WorkerReportsProgress = true;
-			worker.ProgressChanged    += (sender, e) => progress.Value = e.ProgressPercentage;
-			worker.DoWork             += (sender, e) => wordBuilder.Initialize(worker);
-			worker.RunWorkerCompleted += (sender, e) => progress.Visibility = Visibility.Collapsed;
-			worker.RunWorkerAsync();
+			andre = new BackgroundWorker();
+			andre.WorkerReportsProgress = true;
+			andre.ProgressChanged += (sender, e) => progress.Value = e.ProgressPercentage;
+			andre.DoWork += (sender, e) => wordBuilder.Initialize(andre);
+			andre.RunWorkerCompleted += (sender, e) =>
+			{
+				progress.Visibility = Visibility.Collapsed;
+
+				if (nextWork != null)
+				{
+					heresTheGrapesAndHeresTheWrath(nextWork[0], nextWork[1]);
+					nextWork = null;
+				}
+			};
+			andre.RunWorkerAsync();
 
 			wordCache = new Dictionary<string, List<WordScore>>();
 		}
 
 		private void eventInput(object sender, KeyEventArgs e)
 		{
-			HeresTheGrapesAndHeresTheWrath(combo.Text);
+			heresTheGrapesAndHeresTheWrath(combo.Text, input.Text);
 		}
 		private void eventCombo(object sender, SelectionChangedEventArgs e)
 		{
-			HeresTheGrapesAndHeresTheWrath(((ComboBoxItem)e.AddedItems[0]).Content.ToString());
+			heresTheGrapesAndHeresTheWrath(((ComboBoxItem)e.AddedItems[0]).Content.ToString(), input.Text);
 		}
-		private async void HeresTheGrapesAndHeresTheWrath(string wtfWpf)
+		private void heresTheGrapesAndHeresTheWrath(string wordSource, string letters)
 		{
-			List<WordScore> words;
-			var text = String.Join(String.Empty, Regex.Replace(input.Text.ToUpper(), "[^A-Z]", "_").OrderBy(x => x));
-
-			string cacheKey = wtfWpf + '.' + text;
-			if (wordCache.ContainsKey(cacheKey))
+			if (andre != null && andre.IsBusy)
 			{
-				words = wordCache[cacheKey];
+				nextWork = new string[2] { wordSource, letters };
 			}
 			else
 			{
-				words = await wordBuilder.GetWordsAsync(wtfWpf, text);
-				wordCache[cacheKey] = words;
-			}
+				andre = new BackgroundWorker();
+				andre.DoWork += (sender, e) => doWork(wordSource, letters);
+				andre.RunWorkerCompleted += (sender, e) => {
+					resultsTable.Clear();
+					foreach (WordScore word in results)
+					{
+						var row = resultsTable.NewRow();
+						row["Word"] = word.Word;
+						row["Score"] = word.Score;
+						resultsTable.Rows.Add(row);
+					}
 
-			resultsTable.Clear();
-			foreach (WordScore word in words)
+					// XXX ugh.
+					resultGrid.Columns[1].Width = DataGridLength.Auto;
+					resultGrid.Columns[2].Width = DataGridLength.Auto;
+
+					if (nextWork != null)
+					{
+						heresTheGrapesAndHeresTheWrath(nextWork[0], nextWork[1]);
+						nextWork = null;
+					}
+				};
+				andre.RunWorkerAsync();
+			}
+		}
+		private async void doWork(string wordSource, string letters)
+		{
+			var lettersAsc = String.Join(String.Empty, Regex.Replace(letters.ToUpper(), "[^A-Z]", "_").OrderBy(x => x));
+
+			string cacheKey = wordSource + '.' + lettersAsc;
+			if (wordCache.ContainsKey(cacheKey))
 			{
-				var row = resultsTable.NewRow();
-				row["Word"] = word.Word;
-				row["Score"] = word.Score;
-				resultsTable.Rows.Add(row);
+				results = wordCache[cacheKey];
 			}
-
-			// XXX ugh.
-			resultGrid.Columns[1].Width = DataGridLength.Auto;
-			resultGrid.Columns[2].Width = DataGridLength.Auto;
+			else
+			{
+				results = await wordBuilder.GetWordsAsync(wordSource, lettersAsc);
+				wordCache[cacheKey] = results;
+			}
 		}
 	}
 }
