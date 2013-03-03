@@ -15,11 +15,11 @@ namespace GrapesAndWrath
 	}
 	class WordTrie
 	{
-		public Dictionary<string, int> Words;
+		public List<string> Words;
 		public SortedList<char, WordTrie> Next;
 		public WordTrie()
 		{
-			Words = new Dictionary<string, int>();
+			Words = new List<string>();
 			Next = new SortedList<char, WordTrie>();
 		}
 	}
@@ -29,6 +29,7 @@ namespace GrapesAndWrath
 		private Dictionary<string, byte> wordSourceMap;
 		private Dictionary<int, Dictionary<char, int>> scoreMap;
 		private SortedList<char, WordTrie> wt0;
+		private Dictionary<string, byte> wordMask;
 
 		public WordPile(Action<int> reportProgress)
 		{
@@ -39,6 +40,7 @@ namespace GrapesAndWrath
 				{"TWL 06" , 1 << 1},
 				{"SOWPODS", 1 << 2}
 			};
+			wordMask = new Dictionary<string, byte>();
 
 			var data = new Data();
 			scoreMap = new Dictionary<int, Dictionary<char, int>>()
@@ -88,6 +90,8 @@ namespace GrapesAndWrath
 		}
 		private void Add(string word, byte wordSourceMask)
 		{
+			wordMask.Add(word, wordSourceMask);
+
 			char[] wordAsc = word.OrderBy(c => c).ToArray();
 			var wt = wt0;
 			WordTrie wtPrev = null;
@@ -105,7 +109,7 @@ namespace GrapesAndWrath
 					wt = wtPrev.Next;
 				}
 			}
-			wtPrev.Words.Add(word, wordSourceMask);
+			wtPrev.Words.Add(word);
 		}
 
 		public List<WordScore> GetWords(string wordSource, string lettersAsc)
@@ -141,9 +145,9 @@ namespace GrapesAndWrath
 				}
 				if (matchFound)
 				{
-					foreach (string word in w.Value.Words.Keys)
+					foreach (string word in w.Value.Words)
 					{
-						if ((w.Value.Words[word] & wordSourceMask) != 0)
+						if ((wordMask[word] & wordSourceMask) != 0)
 						{
 							int score = 0;
 							foreach (char c in word)
