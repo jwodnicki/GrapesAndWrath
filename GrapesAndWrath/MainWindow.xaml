@@ -19,7 +19,7 @@
 			<ComboBoxItem>TWL 06</ComboBoxItem>
 			<ComboBoxItem>SOWPODS</ComboBoxItem>
 		</ComboBox>
-		<ProgressBar Grid.ColumnSpan="3" Name="progress" Height="9" Width="284" Margin="0,40,0,0" />
+		<ProgressBar Grid.ColumnSpan="3" Name="progress" Height="9" Width="284" Margin="0,37,0,0" />
 		<DataGrid Grid.Row="1" Grid.ColumnSpan="3" Name="resultGrid" ColumnWidth="*" IsReadOnly="True" />
 	</Grid>
 </Window>

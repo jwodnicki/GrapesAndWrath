@@ -43,7 +43,7 @@ namespace GrapesAndWrath
 			andre.DoWork += (sender, e) => wordBuilder.Initialize(andre);
 			andre.RunWorkerCompleted += (sender, e) =>
 			{
-				progress.Visibility = Visibility.Collapsed;
+				progress.Visibility = Visibility.Hidden;
 
 				if (nextWork != null)
 				{
@@ -66,36 +66,49 @@ namespace GrapesAndWrath
 		}
 		private void heresTheGrapesAndHeresTheWrath(string wordSource, string letters)
 		{
-			if (andre != null && andre.IsBusy)
+			if (andre.IsBusy)
 			{
-				nextWork = new string[2] { wordSource, letters };
+				if (andre.WorkerSupportsCancellation)
+				{
+					andre.CancelAsync();
+				}
+				else
+				{
+					nextWork = new string[2] { wordSource, letters };
+					return;
+				}
 			}
-			else
+			progress.Visibility = Visibility.Visible;
+			andre = new BackgroundWorker();
+			andre.WorkerSupportsCancellation = true;
+			andre.DoWork += (sender, e) =>
 			{
-				andre = new BackgroundWorker();
-				andre.DoWork += (sender, e) => doWork(wordSource, letters);
-				andre.RunWorkerCompleted += (sender, e) => {
-					resultsTable.Clear();
-					foreach (WordScore word in results)
-					{
-						var row = resultsTable.NewRow();
-						row["Word"] = word.Word;
-						row["Score"] = word.Score;
-						resultsTable.Rows.Add(row);
-					}
+				doWork(wordSource, letters);
+			};
+			andre.RunWorkerCompleted += (sender, e) =>
+			{
+				progress.Visibility = Visibility.Hidden;
 
-					// XXX ugh.
-					resultGrid.Columns[1].Width = DataGridLength.Auto;
-					resultGrid.Columns[2].Width = DataGridLength.Auto;
+				resultsTable.Clear();
+				foreach (WordScore word in results)
+				{
+					var row = resultsTable.NewRow();
+					row["Word"] = word.Word;
+					row["Score"] = word.Score;
+					resultsTable.Rows.Add(row);
+				}
 
-					if (nextWork != null)
-					{
-						heresTheGrapesAndHeresTheWrath(nextWork[0], nextWork[1]);
-						nextWork = null;
-					}
-				};
-				andre.RunWorkerAsync();
-			}
+				// XXX ugh.
+				resultGrid.Columns[1].Width = DataGridLength.Auto;
+				resultGrid.Columns[2].Width = DataGridLength.Auto;
+
+				if (nextWork != null)
+				{
+					heresTheGrapesAndHeresTheWrath(nextWork[0], nextWork[1]);
+					nextWork = null;
+				}
+			};
+			andre.RunWorkerAsync();
 		}
 		private async void doWork(string wordSource, string letters)
 		{
