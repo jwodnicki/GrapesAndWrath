@@ -78,52 +78,52 @@ namespace GrapesAndWrath
 					return;
 				}
 			}
-			progress.Visibility = Visibility.Visible;
-			andre = new BackgroundWorker();
-			andre.WorkerSupportsCancellation = true;
-			andre.DoWork += (sender, e) =>
-			{
-				doWork(wordSource, letters);
-			};
-			andre.RunWorkerCompleted += (sender, e) =>
-			{
-				progress.Visibility = Visibility.Hidden;
 
-				resultsTable.Clear();
-				foreach (WordScore word in results)
-				{
-					var row = resultsTable.NewRow();
-					row["Word"] = word.Word;
-					row["Score"] = word.Score;
-					resultsTable.Rows.Add(row);
-				}
-
-				// XXX ugh.
-				resultGrid.Columns[1].Width = DataGridLength.Auto;
-				resultGrid.Columns[2].Width = DataGridLength.Auto;
-
-				if (nextWork != null)
-				{
-					heresTheGrapesAndHeresTheWrath(nextWork[0], nextWork[1]);
-					nextWork = null;
-				}
-			};
-			andre.RunWorkerAsync();
-		}
-		private async void doWork(string wordSource, string letters)
-		{
 			var lettersAsc = String.Join(String.Empty, Regex.Replace(letters.ToUpper(), "[^A-Z]", "_").OrderBy(x => x));
 
 			string cacheKey = wordSource + '.' + lettersAsc;
 			if (wordCache.ContainsKey(cacheKey))
 			{
 				results = wordCache[cacheKey];
+				renderGrid();
 			}
 			else
 			{
-				results = await wordBuilder.GetWordsAsync(wordSource, lettersAsc);
-				wordCache[cacheKey] = results;
+				progress.Visibility = Visibility.Visible;
+				andre = new BackgroundWorker();
+				andre.WorkerSupportsCancellation = true;
+				andre.DoWork += async (sender, e) =>
+				{
+					results = await wordBuilder.GetWordsAsync(wordSource, lettersAsc);
+					wordCache[cacheKey] = results;
+				};
+				andre.RunWorkerCompleted += (sender, e) =>
+				{
+					progress.Visibility = Visibility.Hidden;
+					renderGrid();
+					if (nextWork != null)
+					{
+						heresTheGrapesAndHeresTheWrath(nextWork[0], nextWork[1]);
+						nextWork = null;
+					}
+				};
+				andre.RunWorkerAsync();
 			}
+		}
+		private void renderGrid()
+		{
+			resultsTable.Clear();
+			foreach (WordScore word in results)
+			{
+				var row = resultsTable.NewRow();
+				row["Word"] = word.Word;
+				row["Score"] = word.Score;
+				resultsTable.Rows.Add(row);
+			}
+
+			// XXX ugh.
+			resultGrid.Columns[1].Width = DataGridLength.Auto;
+			resultGrid.Columns[2].Width = DataGridLength.Auto;
 		}
 	}
 }
