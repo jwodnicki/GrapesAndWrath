@@ -16,11 +16,11 @@ namespace GrapesAndWrath
 	class WordTrie
 	{
 		public List<string> Words;
-		public SortedList<char, WordTrie> Next;
+		public Dictionary<char, WordTrie> Next;
 		public WordTrie()
 		{
 			Words = new List<string>();
-			Next = new SortedList<char, WordTrie>();
+			Next = new Dictionary<char, WordTrie>();
 		}
 	}
 
@@ -28,12 +28,12 @@ namespace GrapesAndWrath
 	{
 		private Dictionary<string, byte> wordSourceMap;
 		private Dictionary<int, Dictionary<char, int>> scoreMap;
-		private SortedList<char, WordTrie> wt0;
+		private Dictionary<char, WordTrie> wt0;
 		private Dictionary<string, byte> wordMask;
 
 		public WordPile(Action<int> reportProgress)
 		{
-			wt0 = new SortedList<char, WordTrie>();
+			wt0 = new Dictionary<char, WordTrie>();
 
 			wordSourceMap = new Dictionary<string, byte>(){
 				{"Zynga"  , 1 << 0},
@@ -120,32 +120,14 @@ namespace GrapesAndWrath
 			}
 			return GetWords(wordSourceMap[wordSource], wt0, lettersAsc);
 		}
-		private List<WordScore> GetWords(int wordSourceMask, SortedList<char, WordTrie> wt, string lettersAsc)
+		private List<WordScore> GetWords(int wordSourceMask, Dictionary<char, WordTrie> wt, string lettersAsc)
 		{
 			var results = new List<WordScore>();
-
-			foreach (KeyValuePair<char, WordTrie> w in wt)
+			for (int i = 0; i < lettersAsc.Length; i++)
 			{
-				bool matchFound = false;
-				string lettersNext = null;
-
-				for (int i = 0; i < lettersAsc.Length; i++)
+				if (wt.ContainsKey(lettersAsc[i]))
 				{
-					if (lettersAsc[i] < w.Key)
-					{
-						continue;
-					}
-					if (lettersAsc[i] > w.Key)
-					{
-						break;
-					}
-					lettersNext = lettersAsc.Substring(0, i) + lettersAsc.Substring(i + 1);
-					matchFound = true;
-					break;
-				}
-				if (matchFound)
-				{
-					foreach (string word in w.Value.Words)
+					foreach (string word in wt[lettersAsc[i]].Words)
 					{
 						if ((wordMask[word] & wordSourceMask) != 0)
 						{
@@ -157,13 +139,9 @@ namespace GrapesAndWrath
 							results.Add(new WordScore() { Word = word, Score = score });
 						}
 					}
-					if (lettersNext != null)
-					{
-						results.AddRange(GetWords(wordSourceMask, w.Value.Next, lettersNext));
-					}
+					results.AddRange(GetWords(wordSourceMask, wt[lettersAsc[i]].Next, lettersAsc.Substring(0, i) + lettersAsc.Substring(i + 1)));
 				}
 			}
-
 			return results;
 		}
 	}
