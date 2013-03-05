@@ -44,6 +44,7 @@ namespace GrapesAndWrath
 			andre.RunWorkerCompleted += (sender, e) =>
 			{
 				progress.Visibility = Visibility.Hidden;
+				statusText.Text = "Ready";
 
 				if (nextWork != null)
 				{
@@ -89,7 +90,17 @@ namespace GrapesAndWrath
 			}
 			else
 			{
-				progress.Visibility = Visibility.Visible;
+				bool showProgress = lettersAsc.Length > 2 && lettersAsc.Substring(lettersAsc.Length - 2, 2).Equals("__");
+				if (showProgress)
+				{
+					progress.Visibility = Visibility.Visible;
+					statusBar.Visibility = Visibility.Visible;
+					statusText.Text = "Processing \"" + letters + "\"";
+				}
+				else
+				{
+					statusBar.Visibility = Visibility.Collapsed;
+				}
 				andre = new BackgroundWorker();
 				andre.WorkerSupportsCancellation = true;
 				andre.DoWork += (sender, e) =>
@@ -99,7 +110,11 @@ namespace GrapesAndWrath
 				};
 				andre.RunWorkerCompleted += (sender, e) =>
 				{
-					progress.Visibility = Visibility.Hidden;
+					if (showProgress)
+					{
+						progress.Visibility = Visibility.Hidden;
+						statusBar.Visibility = Visibility.Collapsed;
+					}
 					renderGrid();
 					if (nextWork != null)
 					{
