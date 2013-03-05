@@ -131,12 +131,7 @@ namespace GrapesAndWrath
 					{
 						if ((wordMask[word] & wordSourceMask) != 0)
 						{
-							int score = 0;
-							foreach (char c in word)
-							{
-								score += scoreMap[wordSourceMask][c];
-							}
-							results.Add(new WordScore() { Word = word, Score = score });
+							results.Add(new WordScore() { Word = word, Score = word.Aggregate(0, (sum, c) => sum + scoreMap[wordSourceMask][c]) });
 						}
 					}
 					results.AddRange(GetWords(wordSourceMask, wt[lettersAsc[i]].Next, lettersAsc.Substring(0, i) + lettersAsc.Substring(i + 1)));
