@@ -16,7 +16,7 @@ namespace GrapesAndWrath
 		private WordBuilder wordBuilder;
 		private Dictionary<string, List<WordScore>> wordCache;
 
-		private string[] nextWork;
+		private string[] workLast, workNext;
 		private BackgroundWorker andre;
 		private List<WordScore> results;
 
@@ -46,14 +46,15 @@ namespace GrapesAndWrath
 				progress.Visibility = Visibility.Hidden;
 				statusText.Text = "Ready";
 
-				if (nextWork != null)
+				if (workNext != null)
 				{
-					heresTheGrapesAndHeresTheWrath(nextWork[0], nextWork[1]);
-					nextWork = null;
+					heresTheGrapesAndHeresTheWrath(workNext[0], workNext[1]);
+					workNext = null;
 				}
 			};
 			andre.RunWorkerAsync();
 
+			workLast = new string[2];
 			wordCache = new Dictionary<string, List<WordScore>>();
 		}
 
@@ -67,6 +68,10 @@ namespace GrapesAndWrath
 		}
 		private void heresTheGrapesAndHeresTheWrath(string wordSource, string letters)
 		{
+			if (wordSource.Equals(workLast[0]) && letters.Equals(workLast[1]))
+			{
+				return;
+			}
 			if (andre.IsBusy)
 			{
 				if (andre.WorkerSupportsCancellation)
@@ -75,10 +80,11 @@ namespace GrapesAndWrath
 				}
 				else
 				{
-					nextWork = new string[2] { wordSource, letters };
+					workNext = new string[2] { wordSource, letters };
 					return;
 				}
 			}
+			workLast = new string[2] { wordSource, letters };
 
 			var lettersAsc = String.Join(String.Empty, Regex.Replace(letters.ToUpper(), "[^A-Z]", "_").OrderBy(x => x));
 
@@ -110,10 +116,10 @@ namespace GrapesAndWrath
 					{
 						progress.Visibility = Visibility.Hidden;
 					}
-					if (nextWork != null)
+					if (workNext != null)
 					{
-						heresTheGrapesAndHeresTheWrath(nextWork[0], nextWork[1]);
-						nextWork = null;
+						heresTheGrapesAndHeresTheWrath(workNext[0], workNext[1]);
+						workNext = null;
 					}
 				};
 				andre.RunWorkerAsync();

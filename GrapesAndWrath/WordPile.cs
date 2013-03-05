@@ -114,10 +114,6 @@ namespace GrapesAndWrath
 
 		public List<WordScore> GetWords(string wordSource, string lettersAsc)
 		{
-			if (!wt0.ContainsKey(lettersAsc[0]))
-			{
-				return new List<WordScore>();
-			}
 			return GetWords(wordSourceMap[wordSource], wt0, lettersAsc);
 		}
 		private List<WordScore> GetWords(int wordSourceMask, Dictionary<char, WordTrie> wt, string lettersAsc)
@@ -127,12 +123,9 @@ namespace GrapesAndWrath
 			{
 				if (wt.ContainsKey(lettersAsc[i]))
 				{
-					foreach (string word in wt[lettersAsc[i]].Words)
+					foreach (string word in wt[lettersAsc[i]].Words.Where(x => (wordMask[x] & wordSourceMask) != 0))
 					{
-						if ((wordMask[word] & wordSourceMask) != 0)
-						{
-							results.Add(new WordScore() { Word = word, Score = word.Aggregate(0, (sum, c) => sum + scoreMap[wordSourceMask][c]) });
-						}
+						results.Add(new WordScore() { Word = word, Score = word.Aggregate(0, (sum, c) => sum + scoreMap[wordSourceMask][c]) });
 					}
 					results.AddRange(GetWords(wordSourceMask, wt[lettersAsc[i]].Next, lettersAsc.Substring(0, i) + lettersAsc.Substring(i + 1)));
 				}
