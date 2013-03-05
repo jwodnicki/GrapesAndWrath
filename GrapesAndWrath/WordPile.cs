@@ -123,7 +123,7 @@ namespace GrapesAndWrath
 			{
 				if (wt.ContainsKey(lettersAsc[i]))
 				{
-					foreach (string word in wt[lettersAsc[i]].Words.Where(x => (wordMask[x] & wordSourceMask) != 0))
+					foreach (string word in wt[lettersAsc[i]].Words.FindAll(x => (wordMask[x] & wordSourceMask) != 0))
 					{
 						results.Add(new WordScore() { Word = word, Score = word.Aggregate(0, (sum, c) => sum + scoreMap[wordSourceMask][c]) });
 					}
