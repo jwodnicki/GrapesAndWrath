@@ -86,7 +86,7 @@ namespace GrapesAndWrath
 			if (wordCache.ContainsKey(cacheKey))
 			{
 				results = wordCache[cacheKey];
-				renderGrid();
+				statusText.Text = string.Format("{0:n0}", renderGrid()) + " words found";
 			}
 			else
 			{
@@ -94,12 +94,7 @@ namespace GrapesAndWrath
 				if (showProgress)
 				{
 					progress.Visibility = Visibility.Visible;
-					statusBar.Visibility = Visibility.Visible;
 					statusText.Text = "Processing \"" + letters + "\"";
-				}
-				else
-				{
-					statusBar.Visibility = Visibility.Collapsed;
 				}
 				andre = new BackgroundWorker();
 				andre.WorkerSupportsCancellation = true;
@@ -110,12 +105,11 @@ namespace GrapesAndWrath
 				};
 				andre.RunWorkerCompleted += (sender, e) =>
 				{
+					statusText.Text = string.Format("{0:n0}", renderGrid()) + " words found";
 					if (showProgress)
 					{
 						progress.Visibility = Visibility.Hidden;
-						statusBar.Visibility = Visibility.Collapsed;
 					}
-					renderGrid();
 					if (nextWork != null)
 					{
 						heresTheGrapesAndHeresTheWrath(nextWork[0], nextWork[1]);
@@ -125,8 +119,10 @@ namespace GrapesAndWrath
 				andre.RunWorkerAsync();
 			}
 		}
-		private void renderGrid()
+		private int renderGrid()
 		{
+			int count = 0;
+
 			resultsTable.Clear();
 			foreach (WordScore word in results)
 			{
@@ -134,11 +130,14 @@ namespace GrapesAndWrath
 				row["Word"] = word.Word;
 				row["Score"] = word.Score;
 				resultsTable.Rows.Add(row);
+				count++;
 			}
 
 			// XXX ugh.
 			resultGrid.Columns[1].Width = DataGridLength.Auto;
 			resultGrid.Columns[2].Width = DataGridLength.Auto;
+
+			return count;
 		}
 	}
 }
