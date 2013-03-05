@@ -92,9 +92,9 @@ namespace GrapesAndWrath
 				progress.Visibility = Visibility.Visible;
 				andre = new BackgroundWorker();
 				andre.WorkerSupportsCancellation = true;
-				andre.DoWork += async (sender, e) =>
+				andre.DoWork += (sender, e) =>
 				{
-					results = await wordBuilder.GetWordsAsync(wordSource, lettersAsc);
+					results = wordBuilder.GetWords(wordSource, lettersAsc).GroupBy(x => x.Word).Select(g => g.First()).OrderByDescending(x => x.Score).ThenBy(x => x.Word).ToList();
 					wordCache[cacheKey] = results;
 				};
 				andre.RunWorkerCompleted += (sender, e) =>
