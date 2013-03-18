@@ -7,6 +7,7 @@
 			<RowDefinition Height="Auto" />
 			<RowDefinition Height="*" />
 			<RowDefinition Height="Auto" />
+			<RowDefinition Height="Auto" />
 		</Grid.RowDefinitions>
 		<Grid.ColumnDefinitions>
 			<ColumnDefinition Width="Auto" />
@@ -14,15 +15,19 @@
 			<ColumnDefinition Width="92" />
 		</Grid.ColumnDefinitions>
 		<TextBlock Grid.Row="0" Grid.Column="0" Margin="4,0" FontSize="14" Text="LETTERS:" VerticalAlignment="Center" />
-		<TextBox   Grid.Row="0" Grid.Column="1" Name="input" Margin="0,9" FontSize="16" CharacterCasing="Upper" />
-		<ComboBox  Grid.Row="0" Grid.Column="2" Name="combo" Margin="0,9" Width="85" Height="26">
+		<TextBox   Grid.Row="0" Grid.Column="1" Name="inputLetters" Margin="0,6" FontSize="16" CharacterCasing="Upper" />
+		<ComboBox  Grid.Row="0" Grid.Column="2" Name="combo" Margin="0,6" Width="85" Height="26">
 			<ComboBoxItem IsSelected="True">Zynga</ComboBoxItem>
 			<ComboBoxItem>TWL 06</ComboBoxItem>
 			<ComboBoxItem>SOWPODS</ComboBoxItem>
 		</ComboBox>
-		<ProgressBar Grid.ColumnSpan="3" Name="progress" Height="9" Width="284" Margin="0,37,0,0" />
+		<ProgressBar Grid.ColumnSpan="3" Name="progress" Height="6" Width="284" Margin="0,32,0,0" />
 		<DataGrid  Grid.Row="1" Grid.ColumnSpan="3" Name="resultGrid" ColumnWidth="*" IsReadOnly="True" />
-		<StatusBar Grid.Row="2" Grid.ColumnSpan="3" Height="Auto">
+
+		<TextBlock Grid.Row="2" Grid.Column="0" Margin="4,0" FontSize="14" Text="REGEX:" VerticalAlignment="Center" />
+		<TextBox   Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Name="inputRx" FontSize="16" CharacterCasing="Upper" />
+
+		<StatusBar Grid.Row="3" Grid.ColumnSpan="3" Height="Auto">
 			<TextBlock Name="statusText" Text="Loading..." />
 		</StatusBar>
 	</Grid>
