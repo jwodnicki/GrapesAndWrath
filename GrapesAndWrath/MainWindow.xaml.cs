@@ -135,23 +135,26 @@ namespace GrapesAndWrath
 		}
 		private void renderGrid(List<WordScore> results, string rx)
 		{
-			int count = 0;
+			int countRx = 0, countTotal = 0;
 			Regex rxt = new Regex(rx);
 
 			resultsTable.Clear();
 			foreach (WordScore word in results)
 			{
+				countTotal++;
 				if (rxt.Match(word.Word).Success)
 				{
 					var row = resultsTable.NewRow();
 					row["Word"] = word.Word;
 					row["Score"] = word.Score;
 					resultsTable.Rows.Add(row);
-					count++;
+					countRx++;
 				}
 			}
 
-			statusText.Text = string.Format("{0:n0}", count + " words found");
+			statusText.Text = countRx != countTotal ?
+				string.Format("{0:n0} / {1:n0}", countRx, countTotal + " words found") :
+				string.Format("{0:n0}", countTotal + " words found");
 
 			// XXX fixplz
 			resultGrid.Columns[1].Width = DataGridLength.Auto;
