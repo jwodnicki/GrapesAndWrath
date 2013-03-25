@@ -1,41 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
 
 namespace GrapesAndWrath
 {
 	public partial class MainWindow : Window
 	{
-		private DataTable resultsTable;
 		private WordBuilder wordBuilder;
-		private Dictionary<string, List<WordScore>> wordCache;
-
+		private Dictionary<string, Results> wordCache;
 		private string[] workLast, workNext;
 		private BackgroundWorker andre;
 
 		public MainWindow()
 		{
 			InitializeComponent();
-
-			resultsTable = new DataTable();
-			resultsTable.Columns.Add("Word");
-			resultsTable.Columns.Add("Length", System.Type.GetType("System.UInt16"), "LEN(Word)");
-			resultsTable.Columns.Add("Score", System.Type.GetType("System.UInt16"));
-			resultsTable.DefaultView.Sort = "Length desc";
-			resultGrid.ItemsSource = resultsTable.DefaultView;
-
-			inputLetters.KeyUp += eventInput;
-			inputRx.KeyUp += eventInput;
-			combo.SelectionChanged += eventCombo;
 			inputLetters.Focus();
 
 			wordBuilder = new WordBuilder();
+
 			andre = new BackgroundWorker();
 			andre.WorkerReportsProgress = true;
 			andre.ProgressChanged += (sender, e) => progress.Value = e.ProgressPercentage;
@@ -54,7 +42,7 @@ namespace GrapesAndWrath
 			andre.RunWorkerAsync();
 
 			workLast = new string[2];
-			wordCache = new Dictionary<string, List<WordScore>>();
+			wordCache = new Dictionary<string, Results>();
 		}
 
 		private void eventInput(object sender, KeyEventArgs e)
@@ -63,6 +51,7 @@ namespace GrapesAndWrath
 		}
 		private void eventCombo(object sender, SelectionChangedEventArgs e)
 		{
+			if (inputLetters == null) { return; }
 			heresTheGrapesAndHeresTheWrath(((ComboBoxItem)e.AddedItems[0]).Content.ToString(), inputLetters.Text, inputRx.Text);
 		}
 		private void heresTheGrapesAndHeresTheWrath(string wordSource, string letters, string rx)
@@ -77,7 +66,7 @@ namespace GrapesAndWrath
 			}
 			if (letters.Length < 2)
 			{
-				renderGrid(new List<WordScore>(), "");
+				clearGrid();
 				return;
 			}
 			if (andre.IsBusy)
@@ -109,17 +98,23 @@ namespace GrapesAndWrath
 					progress.Visibility = Visibility.Visible;
 					statusText.Text = "Processing \"" + letters + "\"";
 				}
-				List<WordScore> results = null;
 				andre = new BackgroundWorker();
 				andre.WorkerSupportsCancellation = true;
 				andre.DoWork += (sender, e) =>
 				{
-					results = wordBuilder.GetWords(wordSource, lettersAsc).GroupBy(x => x.Word).Select(g => g.First()).OrderByDescending(x => x.Score).ThenBy(x => x.Word).ToList();
-					wordCache[cacheKey] = results;
+					wordCache[cacheKey] = new Results(
+						wordBuilder.GetWords(wordSource, lettersAsc)
+						.GroupBy(x => x.Word)
+						.Select(g => g.First())
+						.OrderByDescending(x => x.Length)
+						.ThenByDescending(x => x.Score)
+						.ThenBy(x => x.Word)
+						.ToList()
+						);
 				};
 				andre.RunWorkerCompleted += (sender, e) =>
 				{
-					renderGrid(results, rx);
+					renderGrid(wordCache[cacheKey], rx);
 					if (showProgress)
 					{
 						progress.Visibility = Visibility.Hidden;
@@ -133,32 +128,48 @@ namespace GrapesAndWrath
 				andre.RunWorkerAsync();
 			}
 		}
-		private void renderGrid(List<WordScore> results, string rx)
-		{
-			int countRx = 0, countTotal = 0;
-			Regex rxt = new Regex(rx);
 
-			resultsTable.Clear();
-			foreach (WordScore word in results)
+		private void eventClear(object sender, EventArgs e)
+		{
+			inputLetters.Text = "";
+			inputRx.Text = "";
+			clearGrid();
+			inputLetters.Focus();
+		}
+
+		private void renderGrid(Results results, string rx)
+		{
+			var view = CollectionViewSource.GetDefaultView(results);
+
+			bool rxApplied = false;
+			try
 			{
-				countTotal++;
-				if (rxt.Match(word.Word).Success)
+				Regex rxt = new Regex(rx);
+				view.Filter = delegate(object item)
 				{
-					var row = resultsTable.NewRow();
-					row["Word"] = word.Word;
-					row["Score"] = word.Score;
-					resultsTable.Rows.Add(row);
-					countRx++;
-				}
+					return rxt.Match(((WordScore)item).Word).Success;
+				};
+				rxApplied = rx != "";
+			}
+			catch { }
+			if (rxApplied)
+			{
+				int filteredCount = view.Cast<WordScore>().Count();
+				statusText.Text = results.Count != filteredCount ?
+					string.Format("{0:n0} / {1:n0}", filteredCount, results.Count + " words found") :
+					string.Format("{0:n0}", results.Count + " words found");
+			}
+			else
+			{
+				statusText.Text = string.Format("{0:n0}", results.Count + " words found");
 			}
 
-			statusText.Text = countRx != countTotal ?
-				string.Format("{0:n0} / {1:n0}", countRx, countTotal + " words found") :
-				string.Format("{0:n0}", countTotal + " words found");
+			grid.ItemsSource = view;
+		}
 
-			// XXX fixplz
-			resultGrid.Columns[1].Width = DataGridLength.Auto;
-			resultGrid.Columns[2].Width = DataGridLength.Auto;
+		private void clearGrid()
+		{
+			renderGrid(new Results(), "");
 		}
 	}
 }

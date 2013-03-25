@@ -2,28 +2,43 @@
 		xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 		Title="Grapes And Wrath" Icon="Titlebar.ico" Height="800" Width="300" Background="#FFE6E6E6">
+	<Window.Resources>
+		<Style x:Key="Center" TargetType="TextBlock">
+			<Setter Property="TextAlignment" Value="Center" />
+		</Style>
+	</Window.Resources>
 	<DockPanel LastChildFill="True">
 		<StackPanel DockPanel.Dock="Top">
 			<DockPanel LastChildFill="True">
 				<TextBlock DockPanel.Dock="Left" Margin="4,0" FontSize="14" Text="LETTERS:" VerticalAlignment="Center" />
-				<ComboBox DockPanel.Dock="Right" Name="combo" Margin="4,5,4,0">
+				<ComboBox DockPanel.Dock="Right" Name="combo" Margin="4,5,4,0" SelectionChanged="eventCombo">
 					<ComboBoxItem IsSelected="True">Zynga</ComboBoxItem>
 					<ComboBoxItem>TWL 06</ComboBoxItem>
 					<ComboBoxItem>SOWPODS</ComboBoxItem>
 				</ComboBox>
-				<TextBox Name="inputLetters" Margin="0,5,0,0" FontSize="16" CharacterCasing="Upper" />
+				<TextBox Name="inputLetters" Margin="0,5,0,0" FontSize="16" CharacterCasing="Upper" KeyUp="eventInput" />
 			</DockPanel>
 			<ProgressBar Name="progress" Height="5" />
 		</StackPanel>
 		<StackPanel DockPanel.Dock="Bottom">
 			<DockPanel LastChildFill="True">
 				<TextBlock Margin="4,0" FontSize="14" Text="REGEX:" VerticalAlignment="Center" />
-				<TextBox Name="inputRx" FontSize="16" CharacterCasing="Upper" />
+				<Button DockPanel.Dock="Right" Content="CLEAR" Click="eventClear" />
+				<TextBox Name="inputRx" FontSize="16" CharacterCasing="Upper" KeyUp="eventInput" />
 			</DockPanel>
 			<StatusBar>
 				<TextBlock Name="statusText" Text="Loading..." />
 			</StatusBar>
 		</StackPanel>
-		<DataGrid Name="resultGrid" ColumnWidth="*" IsReadOnly="True" />
+		<DataGrid
+			Name="grid" AutoGenerateColumns="False" ColumnWidth="*" IsReadOnly="True"
+			HorizontalGridLinesBrush="#FFCCCCCC" VerticalGridLinesBrush="#FFCCCCCC" RowBackground="#FFFFFF" AlternatingRowBackground="#FFF9F9F9"
+		>
+			<DataGrid.Columns>
+				<DataGridTextColumn Header="Word"   Binding="{Binding Word}" />
+				<DataGridTextColumn Header="Length" Binding="{Binding Length}" Width="48" ElementStyle="{StaticResource Center}" />
+				<DataGridTextColumn Header="Score"  Binding="{Binding Score}"  Width="39" ElementStyle="{StaticResource Center}" />
+			</DataGrid.Columns>
+		</DataGrid>
 	</DockPanel>
 </Window>
