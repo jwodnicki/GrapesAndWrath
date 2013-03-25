@@ -170,6 +170,7 @@ namespace GrapesAndWrath
 		private void clearGrid()
 		{
 			renderGrid(new Results(), "");
+			statusText.Text = "Ready";
 		}
 	}
 }
