@@ -156,12 +156,12 @@ namespace GrapesAndWrath
 			{
 				int filteredCount = view.Cast<WordScore>().Count();
 				statusText.Text = results.Count != filteredCount ?
-					string.Format("{0:n0} / {1:n0}", filteredCount, results.Count + " words found") :
-					string.Format("{0:n0}", results.Count + " words found");
+					string.Format("{0:n0} / {1:n0} words found", filteredCount, results.Count) :
+					string.Format("{0:n0} words found", results.Count);
 			}
 			else
 			{
-				statusText.Text = string.Format("{0:n0}", results.Count + " words found");
+				statusText.Text = string.Format("{0:n0} words found", results.Count);
 			}
 
 			grid.ItemsSource = view;
