@@ -16,11 +16,18 @@ namespace GrapesAndWrath
 		private Dictionary<string, List<WordScore>> wordCache;
 		private string[] workLast, workNext;
 		private BackgroundWorker andre;
+		private CollectionViewSource view;
 
 		public MainWindow()
 		{
 			InitializeComponent();
 			inputLetters.Focus();
+
+			// XXX couldn't get the xml-ns to work
+			view = (CollectionViewSource)FindResource("view");
+			view.SortDescriptions.Add(new SortDescription("Length", ListSortDirection.Descending));
+			view.SortDescriptions.Add(new SortDescription("Score", ListSortDirection.Descending));
+			view.SortDescriptions.Add(new SortDescription("Word", ListSortDirection.Ascending));
 
 			wordBuilder = new WordBuilder();
 
@@ -102,15 +109,7 @@ namespace GrapesAndWrath
 				andre.WorkerSupportsCancellation = true;
 				andre.DoWork += (sender, e) =>
 				{
-					wordCache[cacheKey] = new List<WordScore>(
-						wordBuilder.GetWords(wordSource, lettersAsc)
-						.GroupBy(x => x.Word)
-						.Select(g => g.First())
-						.OrderByDescending(x => x.Length)
-						.ThenByDescending(x => x.Score)
-						.ThenBy(x => x.Word)
-						.ToList()
-						);
+					wordCache[cacheKey] = wordBuilder.GetWords(wordSource, lettersAsc).GroupBy(x => x.Word).Select(g => g.First()).ToList();
 				};
 				andre.RunWorkerCompleted += (sender, e) =>
 				{
@@ -139,22 +138,19 @@ namespace GrapesAndWrath
 
 		private void renderGrid(List<WordScore> results, string rx)
 		{
-			var view = CollectionViewSource.GetDefaultView(results);
+			view.Source = results;
 
 			bool rxApplied = false;
 			try
 			{
 				Regex rxt = new Regex(rx);
-				view.Filter = delegate(object item)
-				{
-					return rxt.Match(((WordScore)item).Word).Success;
-				};
+				view.Filter += (sender, e) => e.Accepted = rxt.Match(((WordScore)e.Item).Word).Success;
 				rxApplied = rx != "";
 			}
 			catch { }
 			if (rxApplied)
 			{
-				int filteredCount = view.Cast<WordScore>().Count();
+				int filteredCount = view.View.Cast<WordScore>().Count();
 				statusText.Text = results.Count != filteredCount ?
 					string.Format("{0:n0} / {1:n0} words found", filteredCount, results.Count) :
 					string.Format("{0:n0} words found", results.Count);
@@ -163,8 +159,6 @@ namespace GrapesAndWrath
 			{
 				statusText.Text = string.Format("{0:n0} words found", results.Count);
 			}
-
-			grid.ItemsSource = view;
 		}
 
 		private void clearGrid()

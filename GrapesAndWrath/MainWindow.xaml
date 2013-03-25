@@ -3,6 +3,7 @@
 		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 		Title="Grapes And Wrath" Icon="Titlebar.ico" Height="800" Width="300" Background="#FFE6E6E6">
 	<Window.Resources>
+		<CollectionViewSource x:Key="view" />
 		<Style x:Key="Center" TargetType="TextBlock">
 			<Setter Property="TextAlignment" Value="Center" />
 		</Style>
@@ -31,7 +32,8 @@
 			</StatusBar>
 		</StackPanel>
 		<DataGrid
-			Name="grid" AutoGenerateColumns="False" ColumnWidth="*" IsReadOnly="True"
+			ItemsSource="{Binding Source={StaticResource view}}"
+			Name="grid" AutoGenerateColumns="False" ColumnWidth="*" IsReadOnly="True" HeadersVisibility="Column"
 			HorizontalGridLinesBrush="#FFCCCCCC" VerticalGridLinesBrush="#FFCCCCCC" RowBackground="#FFFFFF" AlternatingRowBackground="#FFF9F9F9"
 		>
 			<DataGrid.Columns>
