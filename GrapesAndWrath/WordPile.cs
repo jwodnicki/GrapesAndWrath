@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -14,18 +13,6 @@ namespace GrapesAndWrath
 		public string Word { get; set; }
 		public int Score { get; set; }
 		public int Length { get { return Word.Length; } }
-	}
-	public class Results : ObservableCollection<WordScore>
-	{
-		public Results() : base() { }
-		public Results(List<WordScore> list) : base(list) { }
-		public void AddRange(Results results)
-		{
-			foreach (var t in results)
-			{
-				Add(t);
-			}
-		}
 	}
 
 	class WordTrie
@@ -127,13 +114,13 @@ namespace GrapesAndWrath
 			wtPrev.Words.Add(word);
 		}
 
-		public Results GetWords(string wordSource, string lettersAsc)
+		public List<WordScore> GetWords(string wordSource, string lettersAsc)
 		{
 			return GetWords(wordSourceMap[wordSource], wt0, lettersAsc);
 		}
-		private Results GetWords(int wordSourceMask, Dictionary<char, WordTrie> wt, string lettersAsc)
+		private List<WordScore> GetWords(int wordSourceMask, Dictionary<char, WordTrie> wt, string lettersAsc)
 		{
-			var results = new Results();
+			var results = new List<WordScore>();
 			for (int i = 0; i < lettersAsc.Length; i++)
 			{
 				if (wt.ContainsKey(lettersAsc[i]))

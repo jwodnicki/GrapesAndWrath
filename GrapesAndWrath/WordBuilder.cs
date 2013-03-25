@@ -13,9 +13,9 @@ namespace GrapesAndWrath
 			wp = new WordPile(x => worker.ReportProgress(x));
 		}
 
-		public Results GetWords(string wordSource, string lettersAsc)
+		public List<WordScore> GetWords(string wordSource, string lettersAsc)
 		{
-			var results = new Results();
+			var results = new List<WordScore>();
 			if (lettersAsc.Length == 0)
 			{
 				return results;

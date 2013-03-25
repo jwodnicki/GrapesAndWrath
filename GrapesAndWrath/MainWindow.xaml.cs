@@ -13,7 +13,7 @@ namespace GrapesAndWrath
 	public partial class MainWindow : Window
 	{
 		private WordBuilder wordBuilder;
-		private Dictionary<string, Results> wordCache;
+		private Dictionary<string, List<WordScore>> wordCache;
 		private string[] workLast, workNext;
 		private BackgroundWorker andre;
 
@@ -42,7 +42,7 @@ namespace GrapesAndWrath
 			andre.RunWorkerAsync();
 
 			workLast = new string[2];
-			wordCache = new Dictionary<string, Results>();
+			wordCache = new Dictionary<string, List<WordScore>>();
 		}
 
 		private void eventInput(object sender, KeyEventArgs e)
@@ -102,7 +102,7 @@ namespace GrapesAndWrath
 				andre.WorkerSupportsCancellation = true;
 				andre.DoWork += (sender, e) =>
 				{
-					wordCache[cacheKey] = new Results(
+					wordCache[cacheKey] = new List<WordScore>(
 						wordBuilder.GetWords(wordSource, lettersAsc)
 						.GroupBy(x => x.Word)
 						.Select(g => g.First())
@@ -137,7 +137,7 @@ namespace GrapesAndWrath
 			inputLetters.Focus();
 		}
 
-		private void renderGrid(Results results, string rx)
+		private void renderGrid(List<WordScore> results, string rx)
 		{
 			var view = CollectionViewSource.GetDefaultView(results);
 
@@ -169,7 +169,7 @@ namespace GrapesAndWrath
 
 		private void clearGrid()
 		{
-			renderGrid(new Results(), "");
+			renderGrid(new List<WordScore>(), "");
 			statusText.Text = "Ready";
 		}
 	}
