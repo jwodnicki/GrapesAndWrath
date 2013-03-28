@@ -11,7 +11,7 @@ namespace FileMaker
 	{
 		static void Main(string[] args)
 		{
-			var wordSourceMap = new Dictionary<string, int>(){
+			var SourceMap = new Dictionary<string, int>(){
 				{"Zynga"  , 1 << 0},
 				{"TWL 06" , 1 << 1},
 				{"SOWPODS", 1 << 2}
@@ -20,7 +20,7 @@ namespace FileMaker
 			var words = new Dictionary<string, int>();
 
 			string word;
-			foreach (KeyValuePair<string, int> kv in wordSourceMap)
+			foreach (KeyValuePair<string, int> kv in SourceMap)
 			{
 				using (TextReader reader = new StreamReader(@"..\..\Resources\" + kv.Key + ".txt"))
 				{

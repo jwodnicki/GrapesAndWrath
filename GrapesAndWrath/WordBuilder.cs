@@ -13,9 +13,9 @@ namespace GrapesAndWrath
 			wp = new WordPile(x => worker.ReportProgress(x));
 		}
 
-		public List<WordScore> GetWords(string wordSource, string lettersAsc)
+		public List<Word> GetWords(string lettersAsc)
 		{
-			var results = new List<WordScore>();
+			var results = new List<Word>();
 			if (lettersAsc.Length == 0)
 			{
 				return results;
@@ -25,12 +25,12 @@ namespace GrapesAndWrath
 				for (int i = 0; i < 26; i++)
 				{
 					var s = lettersAsc.Substring(0, lettersAsc.Length - 1) + Convert.ToChar((int)'A' + i);
-					results.AddRange(GetWords(wordSource, String.Join(String.Empty, s.ToArray().OrderBy(x => x))));
+					results.AddRange(GetWords(String.Join(String.Empty, s.ToArray().OrderBy(x => x))));
 				}
 			}
 			else
 			{
-				results.AddRange(wp.GetWords(wordSource, lettersAsc));
+				results.AddRange(wp.GetWords(lettersAsc));
 			}
 			return results;
 		}

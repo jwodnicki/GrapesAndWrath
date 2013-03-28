@@ -17,7 +17,7 @@
 					<ComboBoxItem>TWL 06</ComboBoxItem>
 					<ComboBoxItem>SOWPODS</ComboBoxItem>
 				</ComboBox>
-				<TextBox Name="inputLetters" Margin="0,5,0,0" FontSize="16" CharacterCasing="Upper" KeyUp="eventInput" />
+				<TextBox Name="inputLetters" Margin="0,5,0,0" FontSize="16" CharacterCasing="Upper" KeyUp="eventLetters" />
 			</DockPanel>
 			<ProgressBar Name="progress" Height="5" />
 		</StackPanel>
@@ -25,7 +25,7 @@
 			<DockPanel LastChildFill="True">
 				<TextBlock Margin="4,0" FontSize="14" Text="REGEX:" VerticalAlignment="Center" />
 				<Button DockPanel.Dock="Right" Content="CLEAR" Click="eventClear" />
-				<TextBox Name="inputRx" FontSize="16" CharacterCasing="Upper" KeyUp="eventInput" />
+				<TextBox Name="inputRx" FontSize="16" CharacterCasing="Upper" KeyUp="eventRx" />
 			</DockPanel>
 			<StatusBar>
 				<TextBlock Name="statusText" Text="Loading..." />
@@ -37,7 +37,7 @@
 			HorizontalGridLinesBrush="#FFCCCCCC" VerticalGridLinesBrush="#FFCCCCCC" RowBackground="#FFFFFF" AlternatingRowBackground="#FFF9F9F9"
 		>
 			<DataGrid.Columns>
-				<DataGridTextColumn Header="Word"   Binding="{Binding Word}" />
+				<DataGridTextColumn Header="Word"   Binding="{Binding Value}" />
 				<DataGridTextColumn Header="Length" Binding="{Binding Length}" Width="48" ElementStyle="{StaticResource Center}" />
 				<DataGridTextColumn Header="Score"  Binding="{Binding Score}"  Width="39" ElementStyle="{StaticResource Center}" />
 			</DataGrid.Columns>

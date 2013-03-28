@@ -8,11 +8,11 @@ using System.Text;
 
 namespace GrapesAndWrath
 {
-	public class WordScore
+	public class Word
 	{
-		public string Word { get; set; }
-		public int Score { get; set; }
-		public int Length { get { return Word.Length; } }
+		public string Value { get; set; }
+		public int Score { get { return Value.Aggregate(0, (sum, i) => sum + Global.ScoreMap[Global.SourceMaskCurrent][i]); } }
+		public int Length { get { return Value.Length; } }
 	}
 
 	class WordTrie
@@ -28,29 +28,11 @@ namespace GrapesAndWrath
 
 	class WordPile
 	{
-		private Dictionary<string, byte> wordSourceMap;
-		private Dictionary<int, Dictionary<char, int>> scoreMap;
 		private Dictionary<char, WordTrie> wt0;
-		private Dictionary<string, byte> wordMask;
 
 		public WordPile(Action<int> reportProgress)
 		{
 			wt0 = new Dictionary<char, WordTrie>();
-
-			wordSourceMap = new Dictionary<string, byte>(){
-				{"Zynga"  , 1 << 0},
-				{"TWL 06" , 1 << 1},
-				{"SOWPODS", 1 << 2}
-			};
-			wordMask = new Dictionary<string, byte>();
-
-			var data = new Data();
-			scoreMap = new Dictionary<int, Dictionary<char, int>>()
-			{
-				{1 << 0, data.pointsZynga},
-				{1 << 1, data.pointsScrabble},
-				{1 << 2, data.pointsScrabble}
-			};
 
 			string s;
 			Assembly ass = this.GetType().Assembly;
@@ -90,9 +72,9 @@ namespace GrapesAndWrath
 				}
 			}
 		}
-		private void Add(string word, byte wordSourceMask)
+		private void Add(string word, byte sourceMask)
 		{
-			wordMask.Add(word, wordSourceMask);
+			Global.WordMask.Add(word, sourceMask);
 
 			char[] wordAsc = word.OrderBy(c => c).ToArray();
 			var wt = wt0;
@@ -114,22 +96,22 @@ namespace GrapesAndWrath
 			wtPrev.Words.Add(word);
 		}
 
-		public List<WordScore> GetWords(string wordSource, string lettersAsc)
+		public List<Word> GetWords(string lettersAsc)
 		{
-			return GetWords(wordSourceMap[wordSource], wt0, lettersAsc);
+			return GetWords(wt0, lettersAsc);
 		}
-		private List<WordScore> GetWords(int wordSourceMask, Dictionary<char, WordTrie> wt, string lettersAsc)
+		private List<Word> GetWords(Dictionary<char, WordTrie> wt, string lettersAsc)
 		{
-			var results = new List<WordScore>();
+			var results = new List<Word>();
 			for (int i = 0; i < lettersAsc.Length; i++)
 			{
 				if (wt.ContainsKey(lettersAsc[i]))
 				{
-					foreach (string word in wt[lettersAsc[i]].Words.FindAll(x => (wordMask[x] & wordSourceMask) != 0))
+					foreach (string word in wt[lettersAsc[i]].Words)
 					{
-						results.Add(new WordScore() { Word = word, Score = word.Aggregate(0, (sum, c) => sum + scoreMap[wordSourceMask][c]) });
+						results.Add(new Word() {Value = word});
 					}
-					results.AddRange(GetWords(wordSourceMask, wt[lettersAsc[i]].Next, lettersAsc.Substring(0, i) + lettersAsc.Substring(i + 1)));
+					results.AddRange(GetWords(wt[lettersAsc[i]].Next, lettersAsc.Substring(0, i) + lettersAsc.Substring(i + 1)));
 				}
 			}
 			return results;
