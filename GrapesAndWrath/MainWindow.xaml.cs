@@ -7,6 +7,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Shell;
 
 namespace GrapesAndWrath
 {
@@ -31,14 +32,22 @@ namespace GrapesAndWrath
 			view.SortDescriptions.Add(new SortDescription("Value", ListSortDirection.Ascending));
 
 			wordBuilder = new WordBuilder();
+			wordCache = new Dictionary<string, List<Word>>();
+
+			TaskbarItemInfo.ProgressState = TaskbarItemProgressState.Normal;
 
 			andre = new BackgroundWorker();
 			andre.WorkerReportsProgress = true;
-			andre.ProgressChanged += (sender, e) => progress.Value = e.ProgressPercentage;
+			andre.ProgressChanged += (sender, e) =>
+			{
+				progress.Value = e.ProgressPercentage;
+				TaskbarItemInfo.ProgressValue = (double)e.ProgressPercentage / 100;
+			};
 			andre.DoWork += (sender, e) => wordBuilder.Initialize(andre);
 			andre.RunWorkerCompleted += (sender, e) =>
 			{
 				progress.Visibility = Visibility.Hidden;
+				TaskbarItemInfo.ProgressState = TaskbarItemProgressState.None;
 				statusText.Text = "Ready";
 
 				if (workNext != null)
@@ -48,7 +57,6 @@ namespace GrapesAndWrath
 				}
 			};
 			andre.RunWorkerAsync();
-			wordCache = new Dictionary<string, List<Word>>();
 		}
 
 		private void eventLetters(object sender, KeyEventArgs e)
@@ -102,6 +110,7 @@ namespace GrapesAndWrath
 				if (showProgress)
 				{
 					progress.Visibility = Visibility.Visible;
+					TaskbarItemInfo.ProgressState = TaskbarItemProgressState.Indeterminate;
 					statusText.Text = "Processing \"" + letters + "\"";
 				}
 				andre = new BackgroundWorker();
@@ -116,6 +125,7 @@ namespace GrapesAndWrath
 					if (showProgress)
 					{
 						progress.Visibility = Visibility.Hidden;
+						TaskbarItemInfo.ProgressState = TaskbarItemProgressState.None;
 					}
 					if (workNext != null)
 					{

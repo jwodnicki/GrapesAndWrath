@@ -4,7 +4,7 @@ namespace GrapesAndWrath
 {
 	public class Global
 	{
-		public static Dictionary<char, int> PointsZynga = new Dictionary<char, int>(){
+		public static readonly Dictionary<char, int> PointsZynga = new Dictionary<char, int>(){
 				{'A', 1},
 				{'B', 4},
 				{'C', 4},
@@ -33,7 +33,7 @@ namespace GrapesAndWrath
 				{'Z',10}
 			};
 
-		public static Dictionary<char, int> PointsScrabble = new Dictionary<char, int>(){
+		public static readonly Dictionary<char, int> PointsScrabble = new Dictionary<char, int>(){
 				{'A', 1},
 				{'B', 3},
 				{'C', 3},
@@ -62,14 +62,14 @@ namespace GrapesAndWrath
 				{'Z',10}
 			};
 
-		public static Dictionary<byte, Dictionary<char, int>> ScoreMap = new Dictionary<byte, Dictionary<char, int>>()
+		public static readonly Dictionary<byte, Dictionary<char, int>> ScoreMap = new Dictionary<byte, Dictionary<char, int>>()
 			{
 				{1 << 0, PointsZynga},
 				{1 << 1, PointsScrabble},
 				{1 << 2, PointsScrabble}
 			};
 
-		public static Dictionary<string, byte> SourceMap = new Dictionary<string, byte>(){
+		public static readonly Dictionary<string, byte> SourceMap = new Dictionary<string, byte>(){
 				{"Zynga"  , 1 << 0},
 				{"TWL 06" , 1 << 1},
 				{"SOWPODS", 1 << 2}

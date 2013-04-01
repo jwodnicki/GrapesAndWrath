@@ -13,6 +13,7 @@ namespace GrapesAndWrath
 		public string Value { get; set; }
 		public int Score { get { return Value.Aggregate(0, (sum, i) => sum + Global.ScoreMap[Global.SourceMaskCurrent][i]); } }
 		public int Length { get { return Value.Length; } }
+		public Word(string value) { Value = value; }
 	}
 
 	class WordTrie
@@ -109,7 +110,7 @@ namespace GrapesAndWrath
 				{
 					foreach (string word in wt[lettersAsc[i]].Words)
 					{
-						results.Add(new Word() {Value = word});
+						results.Add(new Word(word));
 					}
 					results.AddRange(GetWords(wt[lettersAsc[i]].Next, lettersAsc.Substring(0, i) + lettersAsc.Substring(i + 1)));
 				}

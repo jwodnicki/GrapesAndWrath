@@ -8,6 +8,9 @@
 			<Setter Property="TextAlignment" Value="Center" />
 		</Style>
 	</Window.Resources>
+	<Window.TaskbarItemInfo>
+		<TaskbarItemInfo />
+	</Window.TaskbarItemInfo>
 	<DockPanel LastChildFill="True">
 		<StackPanel DockPanel.Dock="Top">
 			<DockPanel LastChildFill="True">
@@ -32,8 +35,8 @@
 			</StatusBar>
 		</StackPanel>
 		<DataGrid
-			ItemsSource="{Binding Source={StaticResource view}}"
-			Name="grid" AutoGenerateColumns="False" ColumnWidth="*" IsReadOnly="True" HeadersVisibility="Column"
+			Name="grid" ItemsSource="{Binding Source={StaticResource view}}"
+			AutoGenerateColumns="False" ColumnWidth="*" IsReadOnly="True" HeadersVisibility="Column"
 			HorizontalGridLinesBrush="#FFCCCCCC" VerticalGridLinesBrush="#FFCCCCCC" RowBackground="#FFFFFF" AlternatingRowBackground="#FFF9F9F9"
 		>
 			<DataGrid.Columns>
