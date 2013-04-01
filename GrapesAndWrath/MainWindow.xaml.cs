@@ -147,7 +147,7 @@ namespace GrapesAndWrath
 
 		private void renderGrid(List<Word> results)
 		{
-			view.Source = results.FindAll(x => (Global.WordMask[x.Value] & Global.SourceMaskCurrent) != 0);
+			view.Source = results = results.FindAll(x => (Global.WordMask[x.Value] & Global.SourceMaskCurrent) != 0);
 
 			bool rxApplied = false;
 			try
