@@ -52,21 +52,21 @@ namespace GrapesAndWrath
 
 				if (workNext != null)
 				{
-					heresTheGrapesAndHeresTheWrath(workNext);
+					HeresTheGrapesAndHeresTheWrath(workNext);
 					workNext = null;
 				}
 			};
 			andre.RunWorkerAsync();
 		}
 
-		private void eventLetters(object sender, KeyEventArgs e)
+		private void OnLetterInput(object sender, KeyEventArgs e)
 		{
 			string letters = inputLetters.Text;
 
 			if (letters.Equals(workLast)) { return; }
 			if (letters.Length < 2)
 			{
-				clearGrid();
+				ClearGrid();
 				return;
 			}
 			if (andre.IsBusy)
@@ -83,26 +83,26 @@ namespace GrapesAndWrath
 			}
 			workLast = letters;
 
-			heresTheGrapesAndHeresTheWrath(letters);
+			HeresTheGrapesAndHeresTheWrath(letters);
 		}
-		private void eventCombo(object sender, SelectionChangedEventArgs e)
+		private void OnComboChange(object sender, SelectionChangedEventArgs e)
 		{
 			if (inputLetters == null) { return; }
 			Global.SourceMaskCurrent = Global.SourceMap[((ComboBoxItem)e.AddedItems[0]).Content.ToString()];
-			heresTheGrapesAndHeresTheWrath(inputLetters.Text);
+			HeresTheGrapesAndHeresTheWrath(inputLetters.Text);
 		}
-		private void eventRx(object sender, KeyEventArgs e)
+		private void OnRxInput(object sender, KeyEventArgs e)
 		{
-			renderGrid(resultsLast);
+			RenderGrid(resultsLast);
 		}
 
-		private void heresTheGrapesAndHeresTheWrath(string letters)
+		private void HeresTheGrapesAndHeresTheWrath(string letters)
 		{
 			var lettersAsc = String.Join(String.Empty, Regex.Replace(letters.ToUpper(), "[^A-Z]", "_").OrderBy(x => x));
 
 			if (wordCache.ContainsKey(lettersAsc))
 			{
-				renderGrid(wordCache[lettersAsc]);
+				RenderGrid(wordCache[lettersAsc]);
 			}
 			else
 			{
@@ -121,7 +121,7 @@ namespace GrapesAndWrath
 				};
 				andre.RunWorkerCompleted += (sender, e) =>
 				{
-					renderGrid(wordCache[lettersAsc]);
+					RenderGrid(wordCache[lettersAsc]);
 					if (showProgress)
 					{
 						progress.Visibility = Visibility.Hidden;
@@ -129,7 +129,7 @@ namespace GrapesAndWrath
 					}
 					if (workNext != null)
 					{
-						heresTheGrapesAndHeresTheWrath(workNext);
+						HeresTheGrapesAndHeresTheWrath(workNext);
 						workNext = null;
 					}
 				};
@@ -137,15 +137,15 @@ namespace GrapesAndWrath
 			}
 		}
 
-		private void eventClear(object sender, EventArgs e)
+		private void OnClear(object sender, EventArgs e)
 		{
 			inputLetters.Text = "";
 			inputRx.Text = "";
-			clearGrid();
+			ClearGrid();
 			inputLetters.Focus();
 		}
 
-		private void renderGrid(List<Word> results)
+		private void RenderGrid(List<Word> results)
 		{
 			view.Source = results = results.FindAll(x => (Global.WordMask[x.Value] & Global.SourceMaskCurrent) != 0);
 
@@ -173,9 +173,9 @@ namespace GrapesAndWrath
 			resultsLast = results;
 		}
 
-		private void clearGrid()
+		private void ClearGrid()
 		{
-			renderGrid(new List<Word>());
+			RenderGrid(new List<Word>());
 			statusText.Text = "Ready";
 		}
 	}

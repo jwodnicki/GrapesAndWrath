@@ -15,20 +15,20 @@
 		<StackPanel DockPanel.Dock="Top">
 			<DockPanel LastChildFill="True">
 				<TextBlock DockPanel.Dock="Left" Margin="4,0" FontSize="14" Text="LETTERS:" VerticalAlignment="Center" />
-				<ComboBox DockPanel.Dock="Right" Name="combo" Margin="4,5,4,0" SelectionChanged="eventCombo">
+				<ComboBox DockPanel.Dock="Right" Name="combo" Margin="4,5,4,0" SelectionChanged="OnComboChange">
 					<ComboBoxItem IsSelected="True">Zynga</ComboBoxItem>
 					<ComboBoxItem>TWL 06</ComboBoxItem>
 					<ComboBoxItem>SOWPODS</ComboBoxItem>
 				</ComboBox>
-				<TextBox Name="inputLetters" Margin="0,5,0,0" FontSize="16" CharacterCasing="Upper" KeyUp="eventLetters" />
+				<TextBox Name="inputLetters" Margin="0,5,0,0" FontSize="16" CharacterCasing="Upper" KeyUp="OnLetterInput" />
 			</DockPanel>
 			<ProgressBar Name="progress" Height="5" />
 		</StackPanel>
 		<StackPanel DockPanel.Dock="Bottom">
 			<DockPanel LastChildFill="True">
 				<TextBlock Margin="4,0" FontSize="14" Text="REGEX:" VerticalAlignment="Center" />
-				<Button DockPanel.Dock="Right" Content="CLEAR" Click="eventClear" />
-				<TextBox Name="inputRx" FontSize="16" CharacterCasing="Upper" KeyUp="eventRx" />
+				<Button DockPanel.Dock="Right" Content="CLEAR" Click="OnClear" />
+				<TextBox Name="inputRx" FontSize="16" CharacterCasing="Upper" KeyUp="OnRxInput" />
 			</DockPanel>
 			<StatusBar>
 				<TextBlock Name="statusText" Text="Loading..." />
