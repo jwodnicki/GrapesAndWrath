@@ -15,6 +15,11 @@ namespace GrapesAndWrath
 
 		public List<Word> GetWords(string lettersAsc)
 		{
+			Global.LetterCountInRack = lettersAsc.GroupBy(c => c).ToDictionary(t => t.Key, t => t.Count());
+			return _GetWords(lettersAsc);
+		}
+		private List<Word> _GetWords(string lettersAsc)
+		{
 			var results = new List<Word>();
 			if (lettersAsc.Length == 0)
 			{
@@ -25,7 +30,7 @@ namespace GrapesAndWrath
 				for (int i = 0; i < 26; i++)
 				{
 					var s = lettersAsc.Substring(0, lettersAsc.Length - 1) + Convert.ToChar((int)'A' + i);
-					results.AddRange(GetWords(String.Join(String.Empty, s.ToArray().OrderBy(x => x))));
+					results.AddRange(_GetWords(String.Join(String.Empty, s.ToArray().OrderBy(x => x))));
 				}
 			}
 			else

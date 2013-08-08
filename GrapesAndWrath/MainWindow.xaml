@@ -14,7 +14,7 @@
 	<DockPanel LastChildFill="True">
 		<StackPanel DockPanel.Dock="Top">
 			<DockPanel LastChildFill="True">
-				<TextBlock DockPanel.Dock="Left" Margin="4,0" FontSize="14" Text="LETTERS:" VerticalAlignment="Center" />
+				<TextBlock DockPanel.Dock="Left" FontSize="14" Text="LETTERS:" VerticalAlignment="Center" Padding="4,2" />
 				<ComboBox DockPanel.Dock="Right" Name="combo" Margin="4,5,4,0" SelectionChanged="OnComboChange">
 					<ComboBoxItem IsSelected="True">Zynga</ComboBoxItem>
 					<ComboBoxItem>TWL 06</ComboBoxItem>
@@ -26,8 +26,8 @@
 		</StackPanel>
 		<StackPanel DockPanel.Dock="Bottom">
 			<DockPanel LastChildFill="True">
-				<TextBlock Margin="4,0" FontSize="14" Text="REGEX:" VerticalAlignment="Center" />
-				<Button DockPanel.Dock="Right" Content="CLEAR" Click="OnClear" />
+				<TextBlock FontSize="14" Text="REGEX:" VerticalAlignment="Center" Padding="4,2" />
+				<Button DockPanel.Dock="Right" Content="CLEAR" Click="OnClear" Padding="4,2" />
 				<TextBox Name="inputRx" FontSize="16" CharacterCasing="Upper" KeyUp="OnRxInput" />
 			</DockPanel>
 			<StatusBar>

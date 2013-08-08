@@ -11,8 +11,18 @@ namespace GrapesAndWrath
 	public class Word
 	{
 		public string Value { get; set; }
-		public int Score { get { return Value.Aggregate(0, (sum, i) => sum + Global.ScoreMap[Global.SourceMaskCurrent][i]); } }
 		public int Length { get { return Value.Length; } }
+		public int Score
+		{
+			get
+			{
+				var letterCountInRack = Global.LetterCountInRack.ToDictionary(t => t.Key, t => t.Value);
+				return Value.Aggregate(0, (sum, i) => sum + (
+					letterCountInRack.ContainsKey(i) && letterCountInRack[i]-- > 0 ?
+						Global.ScoreMap[Global.SourceMaskCurrent][i] : 0
+					));
+			}
+		}
 		public Word(string value) { Value = value; }
 	}
 

@@ -75,7 +75,10 @@ namespace GrapesAndWrath
 				{"SOWPODS", 1 << 2}
 			};
 
-		public static byte SourceMaskCurrent = 1 << 0;
 		public static Dictionary<string, byte> WordMask = new Dictionary<string, byte>();
+
+		// XXX here for now
+		public static byte SourceMaskCurrent = 1 << 0;
+		public static Dictionary<char, int> LetterCountInRack;
 	}
 }
