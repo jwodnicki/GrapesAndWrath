@@ -16,11 +16,13 @@ namespace GrapesAndWrath
 		{
 			get
 			{
-				var letterCountInRack = Global.LetterCountInRack.ToDictionary(t => t.Key, t => t.Value);
-				return Value.Aggregate(0, (sum, i) => sum + (
-					letterCountInRack.ContainsKey(i) && letterCountInRack[i]-- > 0 ?
-						Global.ScoreMap[Global.SourceMaskCurrent][i] : 0
-					));
+				var letterCountInWord = new Dictionary<char, int>();
+				return Value.Aggregate(0, (sum, i) =>
+				{
+					if (!Global.LetterCountInRack.ContainsKey(i)) return sum;
+					if (!letterCountInWord.ContainsKey(i)) letterCountInWord[i] = 0;
+					return sum + (Global.LetterCountInRack[i] > letterCountInWord[i]++ ? Global.ScoreMap[Global.SourceMaskCurrent][i] : 0);
+				});
 			}
 		}
 		public Word(string value) { Value = value; }
