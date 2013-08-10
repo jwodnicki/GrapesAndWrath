@@ -147,11 +147,7 @@ namespace GrapesAndWrath
 
 			ProgressBar = new ProgressBar();
 			ClearCommand = new DelegateCommand(ClearAll);
-
 			View = new CollectionViewSource();
-			View.SortDescriptions.Add(new SortDescription("Length", ListSortDirection.Descending));
-			View.SortDescriptions.Add(new SortDescription("Score", ListSortDirection.Descending));
-			View.SortDescriptions.Add(new SortDescription("Value", ListSortDirection.Ascending));
 
 			TaskbarProgressState = TaskbarItemProgressState.Normal;
 			WordSources = new ObservableCollection<string>() { "Zynga", "TWL 06", "SOWPODS" };
@@ -224,6 +220,14 @@ namespace GrapesAndWrath
 		private void Render(List<Word> results)
 		{
 			View.Source = results = results.FindAll(x => (Global.WordMask[x.Value] & Global.SourceMaskCurrent) != 0);
+
+			// XXX ugh.
+			using (View.DeferRefresh())
+			{
+				View.SortDescriptions.Add(new SortDescription("Length", ListSortDirection.Descending));
+				View.SortDescriptions.Add(new SortDescription("Score", ListSortDirection.Descending));
+				View.SortDescriptions.Add(new SortDescription("Value", ListSortDirection.Ascending));
+			}
 
 			bool rxApplied = false;
 			try
