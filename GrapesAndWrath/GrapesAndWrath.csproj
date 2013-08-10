@@ -91,12 +91,15 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="DelegateCommand.cs" />
     <Compile Include="Global.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="UserInterface.cs" />
+    <Compile Include="ViewModel.cs" />
     <Compile Include="WordPile.cs" />
     <Compile Include="WordBuilder.cs" />
     <Page Include="MainWindow.xaml">

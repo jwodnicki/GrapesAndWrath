@@ -1,9 +1,9 @@
 ﻿<Window x:Class="GrapesAndWrath.MainWindow"
 		xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-		Title="Grapes And Wrath" Icon="Titlebar.ico" Height="800" Width="300" Background="#FFE6E6E6">
+		Title="Grapes And Wrath" Icon="Titlebar.ico" Height="800" Width="300" Background="#FFEFEFF2">
 	<Window.Resources>
-		<CollectionViewSource x:Key="view" />
+		<CollectionViewSource x:Key="xamlView" />
 		<Style x:Key="Center" TargetType="TextBlock">
 			<Setter Property="TextAlignment" Value="Center" />
 		</Style>
@@ -11,31 +11,41 @@
 	<Window.TaskbarItemInfo>
 		<TaskbarItemInfo />
 	</Window.TaskbarItemInfo>
-	<DockPanel LastChildFill="True">
+	<DockPanel Name="xamlPanel" LastChildFill="True">
+		<DockPanel.Style>
+			<Style>
+				<Style.Triggers>
+					<DataTrigger Binding="{Binding FocusLetters}" Value="True">
+						<Setter Property="FocusManager.FocusedElement" Value="{Binding ElementName=letters}"/>
+					</DataTrigger>
+				</Style.Triggers>
+			</Style>
+		</DockPanel.Style>
 		<StackPanel DockPanel.Dock="Top">
 			<DockPanel LastChildFill="True">
 				<TextBlock DockPanel.Dock="Left" FontSize="14" Text="LETTERS:" VerticalAlignment="Center" Padding="4,2" />
-				<ComboBox DockPanel.Dock="Right" Name="combo" Margin="4,5,4,0" SelectionChanged="OnComboChange">
-					<ComboBoxItem IsSelected="True">Zynga</ComboBoxItem>
-					<ComboBoxItem>TWL 06</ComboBoxItem>
-					<ComboBoxItem>SOWPODS</ComboBoxItem>
-				</ComboBox>
-				<TextBox Name="inputLetters" Margin="0,5,0,0" FontSize="16" CharacterCasing="Upper" KeyUp="OnLetterInput" />
+				<ComboBox
+					DockPanel.Dock="Right" Margin="4,4,4,0"
+					ItemsSource="{Binding WordSources}" SelectedValue="{Binding WordSource}" DisplayMemberPath="." SelectedValuePath="."
+				/>
+				<TextBox Name="letters" Text="{Binding Letters, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,0" FontSize="16" CharacterCasing="Upper" />
 			</DockPanel>
-			<ProgressBar Name="progress" Height="5" />
+			<ProgressBar Value="{Binding ProgressBar.Value}" Visibility="{Binding ProgressBar.Visibility}" Height="4" />
 		</StackPanel>
 		<StackPanel DockPanel.Dock="Bottom">
 			<DockPanel LastChildFill="True">
-				<TextBlock FontSize="14" Text="REGEX:" VerticalAlignment="Center" Padding="4,2" />
-				<Button DockPanel.Dock="Right" Content="CLEAR" Click="OnClear" Padding="4,2" />
-				<TextBox Name="inputRx" FontSize="16" CharacterCasing="Upper" KeyUp="OnRxInput" />
+				<Border BorderThickness="0,0,0,1" BorderBrush="#FFADABB3">
+					<TextBlock FontSize="14" Text="REGEX:" VerticalAlignment="Center" Padding="4,2" />
+				</Border>
+				<Button DockPanel.Dock="Right" Command="{Binding ClearCommand}" Content="CLEAR" Padding="4,2" />
+				<TextBox Text="{Binding RegEx, UpdateSourceTrigger=PropertyChanged}" FontSize="16" CharacterCasing="Upper" />
 			</DockPanel>
 			<StatusBar>
-				<TextBlock Name="statusText" Text="Loading..." />
+				<TextBlock Text="{Binding Status}" />
 			</StatusBar>
 		</StackPanel>
 		<DataGrid
-			Name="grid" ItemsSource="{Binding Source={StaticResource view}}"
+			Name="grid" ItemsSource="{Binding Source={StaticResource xamlView}}"
 			AutoGenerateColumns="False" ColumnWidth="*" IsReadOnly="True" HeadersVisibility="Column"
 			HorizontalGridLinesBrush="#FFCCCCCC" VerticalGridLinesBrush="#FFCCCCCC" RowBackground="#FFFFFF" AlternatingRowBackground="#FFF9F9F9"
 		>
