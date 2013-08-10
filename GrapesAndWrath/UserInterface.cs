@@ -56,7 +56,7 @@ namespace GrapesAndWrath
 				_regex = value;
 				NotifyPropertyChanged("RegEx");
 
-				Render(resultsLast);
+				Render((List<Word>)View.Source);
 			}
 		}
 
@@ -138,7 +138,6 @@ namespace GrapesAndWrath
 		private Dictionary<string, List<Word>> wordCache;
 		private string workLast, workNext;
 		private BackgroundWorker andre;
-		private List<Word> resultsLast;
 
 		public UserInterface()
 		{
@@ -219,7 +218,31 @@ namespace GrapesAndWrath
 
 		private void Render(List<Word> results)
 		{
-			View.Source = results = results.FindAll(x => (Global.WordMask[x.Value] & Global.SourceMaskCurrent) != 0);
+			using (View.DeferRefresh())
+			{
+				View.Source = results = results.FindAll(x => (Global.WordMask[x.Value] & Global.SourceMaskCurrent) != 0);
+
+				bool rxApplied = false;
+				try
+				{
+					Regex rx = new Regex(RegEx);
+					View.Filter += (sender, e) => e.Accepted = rx.Match(((Word)e.Item).Value).Success;
+					rxApplied = RegEx != "";
+				}
+				catch { }
+
+				if (rxApplied)
+				{
+					int filteredCount = View.View.Cast<Word>().Count();
+					Status = results.Count != filteredCount ?
+						string.Format("{0:n0} / {1:n0} words found", filteredCount, results.Count) :
+						string.Format("{0:n0} words found", results.Count);
+				}
+				else
+				{
+					Status = string.Format("{0:n0} words found", results.Count);
+				}
+			}
 
 			// XXX ugh.
 			using (View.DeferRefresh())
@@ -228,29 +251,6 @@ namespace GrapesAndWrath
 				View.SortDescriptions.Add(new SortDescription("Score", ListSortDirection.Descending));
 				View.SortDescriptions.Add(new SortDescription("Value", ListSortDirection.Ascending));
 			}
-
-			bool rxApplied = false;
-			try
-			{
-				Regex rx = new Regex(RegEx);
-				View.Filter += (sender, e) => e.Accepted = rx.Match(((Word)e.Item).Value).Success;
-				rxApplied = RegEx != "";
-			}
-			catch { }
-
-			if (rxApplied)
-			{
-				int filteredCount = View.View.Cast<Word>().Count();
-				Status = results.Count != filteredCount ?
-					string.Format("{0:n0} / {1:n0} words found", filteredCount, results.Count) :
-					string.Format("{0:n0} words found", results.Count);
-			}
-			else
-			{
-				Status = string.Format("{0:n0} words found", results.Count);
-			}
-
-			resultsLast = results;
 		}
 
 		private void ClearResults()
