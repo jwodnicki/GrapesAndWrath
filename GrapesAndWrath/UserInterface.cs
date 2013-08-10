@@ -12,7 +12,7 @@ using System.Windows.Shell;
 
 namespace GrapesAndWrath
 {
-	class UserInterface : ViewModel
+	public class UserInterface : ViewModel
 	{
 		private string _letters;
 		public string Letters
@@ -98,54 +98,78 @@ namespace GrapesAndWrath
 		}
 		public ObservableCollection<string> WordSources { get; set; }
 
+		private TaskbarItemProgressState _taskbarProgressState;
+		public TaskbarItemProgressState TaskbarProgressState
+		{
+			get { return _taskbarProgressState; }
+			set
+			{
+				_taskbarProgressState = value;
+				NotifyPropertyChanged("TaskbarProgressState");
+			}
+		}
+
+		private double _taskbarProgressValue;
+		public double TaskbarProgressValue
+		{
+			get { return _taskbarProgressValue; }
+			set
+			{
+				_taskbarProgressValue = value;
+				NotifyPropertyChanged("TaskbarProgressValue");
+			}
+		}
+
+		private CollectionViewSource _view;
+		public CollectionViewSource View
+		{
+			get { return _view; }
+			set
+			{
+				_view = value;
+				NotifyPropertyChanged("View");
+			}
+		}
+
 		public ProgressBar ProgressBar { get; set; }
 		public ICommand ClearCommand { get; set; }
 
-		private CollectionViewSource view;
-		public TaskbarItemInfo taskbar;
 		private WordBuilder wordBuilder;
 		private Dictionary<string, List<Word>> wordCache;
 		private string workLast, workNext;
 		private BackgroundWorker andre;
 		private List<Word> resultsLast;
 
-		public UserInterface(CollectionViewSource xamlView, TaskbarItemInfo xamlTaskbar)
+		public UserInterface()
 		{
-			// XXX couldn't get xml-ns or findresource to work
-			view = xamlView;
-			view.SortDescriptions.Add(new SortDescription("Length", ListSortDirection.Descending));
-			view.SortDescriptions.Add(new SortDescription("Score", ListSortDirection.Descending));
-			view.SortDescriptions.Add(new SortDescription("Value", ListSortDirection.Ascending));
-
-			taskbar = xamlTaskbar;
-			ProgressBar = new ProgressBar();
-			andre = new BackgroundWorker();
 			wordBuilder = new WordBuilder();
 			wordCache = new Dictionary<string, List<Word>>();
+
+			ProgressBar = new ProgressBar();
 			ClearCommand = new DelegateCommand(ClearAll);
 
+			View = new CollectionViewSource();
+			View.SortDescriptions.Add(new SortDescription("Length", ListSortDirection.Descending));
+			View.SortDescriptions.Add(new SortDescription("Score", ListSortDirection.Descending));
+			View.SortDescriptions.Add(new SortDescription("Value", ListSortDirection.Ascending));
+
+			TaskbarProgressState = TaskbarItemProgressState.Normal;
 			WordSources = new ObservableCollection<string>() { "Zynga", "TWL 06", "SOWPODS" };
 			WordSource = "Zynga";
 			Status = "Loading...";
 			FocusLetters = true;
-		}
 
-		public void Initialize()
-		{
-
-			taskbar.ProgressState = TaskbarItemProgressState.Normal;
-
-			andre.WorkerReportsProgress = true;
+			andre = new BackgroundWorker() { WorkerReportsProgress = true };
 			andre.ProgressChanged += (sender, e) =>
 			{
 				ProgressBar.Value = e.ProgressPercentage;
-				taskbar.ProgressValue = (double)e.ProgressPercentage / 100;
+				TaskbarProgressValue = (double)e.ProgressPercentage / 100;
 			};
 			andre.DoWork += (sender, e) => wordBuilder.Initialize(andre);
 			andre.RunWorkerCompleted += (sender, e) =>
 			{
 				ProgressBar.Visibility = Visibility.Hidden;
-				taskbar.ProgressState = TaskbarItemProgressState.None;
+				TaskbarProgressState = TaskbarItemProgressState.None;
 				Status = "Ready";
 
 				if (workNext != null)
@@ -171,11 +195,10 @@ namespace GrapesAndWrath
 				if (showProgress)
 				{
 					ProgressBar.Visibility = Visibility.Visible;
-					taskbar.ProgressState = TaskbarItemProgressState.Indeterminate;
+					TaskbarProgressState = TaskbarItemProgressState.Indeterminate;
 					Status = "Processing \"" + letters + "\"";
 				}
-				andre = new BackgroundWorker();
-				andre.WorkerSupportsCancellation = true;
+				andre = new BackgroundWorker() { WorkerReportsProgress = true };
 				andre.DoWork += (sender, e) =>
 				{
 					wordCache[lettersAsc] = wordBuilder.GetWords(lettersAsc).GroupBy(x => x.Value).Select(g => g.First()).ToList();
@@ -186,7 +209,7 @@ namespace GrapesAndWrath
 					if (showProgress)
 					{
 						ProgressBar.Visibility = Visibility.Hidden;
-						taskbar.ProgressState = TaskbarItemProgressState.None;
+						TaskbarProgressState = TaskbarItemProgressState.None;
 					}
 					if (workNext != null)
 					{
@@ -200,20 +223,20 @@ namespace GrapesAndWrath
 
 		private void Render(List<Word> results)
 		{
-			view.Source = results = results.FindAll(x => (Global.WordMask[x.Value] & Global.SourceMaskCurrent) != 0);
+			View.Source = results = results.FindAll(x => (Global.WordMask[x.Value] & Global.SourceMaskCurrent) != 0);
 
 			bool rxApplied = false;
 			try
 			{
 				Regex rx = new Regex(RegEx);
-				view.Filter += (sender, e) => e.Accepted = rx.Match(((Word)e.Item).Value).Success;
+				View.Filter += (sender, e) => e.Accepted = rx.Match(((Word)e.Item).Value).Success;
 				rxApplied = RegEx != "";
 			}
 			catch { }
 
 			if (rxApplied)
 			{
-				int filteredCount = view.View.Cast<Word>().Count();
+				int filteredCount = View.View.Cast<Word>().Count();
 				Status = results.Count != filteredCount ?
 					string.Format("{0:n0} / {1:n0} words found", filteredCount, results.Count) :
 					string.Format("{0:n0} words found", results.Count);

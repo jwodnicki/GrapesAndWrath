@@ -1,22 +1,25 @@
 ﻿<Window x:Class="GrapesAndWrath.MainWindow"
 		xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:app="clr-namespace:GrapesAndWrath"
 		Title="Grapes And Wrath" Icon="Titlebar.ico" Height="800" Width="300" Background="#FFEFEFF2">
 	<Window.Resources>
-		<CollectionViewSource x:Key="xamlView" />
 		<Style x:Key="Center" TargetType="TextBlock">
 			<Setter Property="TextAlignment" Value="Center" />
 		</Style>
 	</Window.Resources>
+	<Window.DataContext>
+		<app:UserInterface />
+	</Window.DataContext>
 	<Window.TaskbarItemInfo>
-		<TaskbarItemInfo />
+		<TaskbarItemInfo ProgressValue="{Binding TaskbarProgressValue}" ProgressState="{Binding TaskbarProgressState}" />
 	</Window.TaskbarItemInfo>
-	<DockPanel Name="xamlPanel" LastChildFill="True">
+	<DockPanel LastChildFill="True">
 		<DockPanel.Style>
 			<Style>
 				<Style.Triggers>
 					<DataTrigger Binding="{Binding FocusLetters}" Value="True">
-						<Setter Property="FocusManager.FocusedElement" Value="{Binding ElementName=letters}"/>
+						<Setter Property="FocusManager.FocusedElement" Value="{Binding ElementName=letters}" />
 					</DataTrigger>
 				</Style.Triggers>
 			</Style>
@@ -26,8 +29,7 @@
 				<TextBlock DockPanel.Dock="Left" FontSize="14" Text="LETTERS:" VerticalAlignment="Center" Padding="4,2" />
 				<ComboBox
 					DockPanel.Dock="Right" Margin="4,4,4,0"
-					ItemsSource="{Binding WordSources}" SelectedValue="{Binding WordSource}" DisplayMemberPath="." SelectedValuePath="."
-				/>
+					ItemsSource="{Binding WordSources}" SelectedValue="{Binding WordSource}" DisplayMemberPath="." SelectedValuePath="." />
 				<TextBox Name="letters" Text="{Binding Letters, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,0" FontSize="16" CharacterCasing="Upper" />
 			</DockPanel>
 			<ProgressBar Value="{Binding ProgressBar.Value}" Visibility="{Binding ProgressBar.Visibility}" Height="4" />
@@ -45,10 +47,9 @@
 			</StatusBar>
 		</StackPanel>
 		<DataGrid
-			Name="grid" ItemsSource="{Binding Source={StaticResource xamlView}}"
+			ItemsSource="{Binding View.View}"
 			AutoGenerateColumns="False" ColumnWidth="*" IsReadOnly="True" HeadersVisibility="Column"
-			HorizontalGridLinesBrush="#FFCCCCCC" VerticalGridLinesBrush="#FFCCCCCC" RowBackground="#FFFFFF" AlternatingRowBackground="#FFF9F9F9"
-		>
+			HorizontalGridLinesBrush="#FFCCCCCC" VerticalGridLinesBrush="#FFCCCCCC" RowBackground="#FFFFFF" AlternatingRowBackground="#FFF9F9F9">
 			<DataGrid.Columns>
 				<DataGridTextColumn Header="Word"   Binding="{Binding Value}" />
 				<DataGridTextColumn Header="Length" Binding="{Binding Length}" Width="48" ElementStyle="{StaticResource Center}" />
