@@ -179,6 +179,7 @@ namespace GrapesAndWrath
 		private void HeresTheGrapesAndHeresTheWrath(string letters)
 		{
 			var lettersAsc = String.Join(String.Empty, Regex.Replace(letters.ToUpper(), "[^A-Z]", "_").OrderBy(x => x));
+			Global.LetterCountInRack = lettersAsc.GroupBy(c => c).ToDictionary(t => t.Key, t => t.Count());
 
 			if (wordCache.ContainsKey(lettersAsc))
 			{
