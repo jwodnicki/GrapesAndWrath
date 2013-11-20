@@ -120,6 +120,28 @@ namespace GrapesAndWrath
 			}
 		}
 
+		private int _progressBarValue;
+		public int ProgressBarValue
+		{
+			get { return _progressBarValue; }
+			set
+			{
+				_progressBarValue = value;
+				NotifyPropertyChanged("ProgressBarValue");
+			}
+		}
+
+		private Visibility _progressBarVisibility;
+		public Visibility ProgressBarVisibility
+		{
+			get { return _progressBarVisibility; }
+			set
+			{
+				_progressBarVisibility = value;
+				NotifyPropertyChanged("ProgressBarVisibility");
+			}
+		}
+
 		private CollectionViewSource _view;
 		public CollectionViewSource View
 		{
@@ -131,7 +153,6 @@ namespace GrapesAndWrath
 			}
 		}
 
-		public ProgressBar ProgressBar { get; set; }
 		public ICommand ClearCommand { get; set; }
 
 		private WordBuilder wordBuilder;
@@ -144,7 +165,6 @@ namespace GrapesAndWrath
 			wordBuilder = new WordBuilder();
 			wordCache = new Dictionary<string, List<Word>>();
 
-			ProgressBar = new ProgressBar();
 			ClearCommand = new DelegateCommand(ClearAll);
 			View = new CollectionViewSource();
 
@@ -157,13 +177,13 @@ namespace GrapesAndWrath
 			andre = new BackgroundWorker() { WorkerReportsProgress = true };
 			andre.ProgressChanged += (sender, e) =>
 			{
-				ProgressBar.Value = e.ProgressPercentage;
+				ProgressBarValue = e.ProgressPercentage;
 				TaskbarProgressValue = (double)e.ProgressPercentage / 100;
 			};
 			andre.DoWork += (sender, e) => wordBuilder.Initialize(andre);
 			andre.RunWorkerCompleted += (sender, e) =>
 			{
-				ProgressBar.Visibility = Visibility.Hidden;
+				ProgressBarVisibility = Visibility.Hidden;
 				TaskbarProgressState = TaskbarItemProgressState.None;
 				Status = "Ready";
 
@@ -190,7 +210,7 @@ namespace GrapesAndWrath
 				bool showProgress = lettersAsc.Substring(lettersAsc.Length - 2, 2).Equals("__");
 				if (showProgress)
 				{
-					ProgressBar.Visibility = Visibility.Visible;
+					ProgressBarVisibility = Visibility.Visible;
 					TaskbarProgressState = TaskbarItemProgressState.Indeterminate;
 					Status = "Processing \"" + letters + "\"";
 				}
@@ -204,7 +224,7 @@ namespace GrapesAndWrath
 					Render(wordCache[lettersAsc]);
 					if (showProgress)
 					{
-						ProgressBar.Visibility = Visibility.Hidden;
+						ProgressBarVisibility = Visibility.Hidden;
 						TaskbarProgressState = TaskbarItemProgressState.None;
 					}
 					if (workNext != null)
